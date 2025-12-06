@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
 // Kita buat Model objek untuk data dari Firestore
 class Item {
   final String id;
@@ -64,5 +65,17 @@ class FirestoreService {
       'name': name,
       'point': point
     });
+  }
+  // ---- METHOD UPDATE ---- //
+  Future<void> updateItem(String id, String name,  int point) {
+    return _db.collection('user_items').doc(id).update({
+      'name': name,
+      'point': point
+    });
+  }
+
+  // ---- METHOD DELETE---- //
+  Future<void> deleteItem(String id) {
+    return _db.collection('user_items').doc(id).delete();
   }
 }

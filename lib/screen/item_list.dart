@@ -9,167 +9,187 @@ class ItemListScreen extends StatefulWidget {
 }
 
 class _ItemListScreenState extends State<ItemListScreen> {
-  // 1. Panggil Service yang sudah kita buat untuk akses ke Firestore
-  final FirestoreService _firestoreService = FirestoreService();
+  final _firestoreService = FirestoreService();
 
-  // 2. Siapkan Controller untuk menangkap input teks dari user
-  // Controller ini ibarat "wadah" penampung ketikan user
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _pointController = TextEditingController();
 
+  // ---- LETAK PERUBAHAN ---- //
+  void _showDialog({ Item? item }) {
+    if (item != null) {
+      _nameController.text = item.name;
+      _pointController.text = item.point.toString();
+    } else {
+      _nameController.clear();
+      _pointController.clear();
+    }
 
-  // ====================================================================
-  // LOGIKA CREATE (Menambah Data)
-  // ====================================================================
-  void _showDialog() {
-    // PENTING: Reset/Bersihkan isi form setiap kali dialog dibuka.
-    // Jika tidak di-clear, tulisan lama akan tetap muncul saat user membuka dialog lagi.
-    _nameController.clear();
-    _pointController.clear();
-
+    // ---- LETAK PERUBAHAN ---- //
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Tambah Data'),
+          title: Text(item == null ? "Tambah Item" : "Edit Item"),
           content: Column(
-            mainAxisSize: MainAxisSize.min, // Agar dialog tidak memanjang ke bawah
+            mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: _nameController, // Hubungkan TextField dengan controller
-                decoration: InputDecoration(
-                    labelText: 'Nama Item'
-                ),
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: "Nama Item"),
               ),
               TextField(
-                controller: _pointController, // Hubungkan TextField dengan controller
-                decoration: InputDecoration(
-                    labelText: 'Poin Item'
-                ),
-                keyboardType: TextInputType.number, // Keyboard angka
+                controller: _pointController,
+                decoration: const InputDecoration(labelText: "Poin Item"),
+                keyboardType: TextInputType.number,
               ),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context), // Tutup dialog
-              child: Text("Batal"),
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Batal"),
             ),
             ElevatedButton(
               onPressed: () {
-                // 1. Ambil nilai dari controller
-                final String name = _nameController.text;
+                final name = _nameController.text;
+                final point = int.tryParse(_pointController.text) ?? 0;
 
-                // 2. Konversi Poin ke Integer dengan aman (gunakan tryParse)
-                // Jika user input huruf/kosong, nilai default jadi 0
-                final int point = int.tryParse(_pointController.text) ?? 0;
-
-                // 3. Validasi sederhana: Nama tidak boleh kosong
+                // ---- LETAK PERUBAHAN ---- //
                 if (name.isNotEmpty) {
-                  // Panggil fungsi CREATE dari Service
-                  _firestoreService.addItem(name, point);
+                  if (item == null) {
+                    _firestoreService.addItem(name, point);
+                  } else {
+                    _firestoreService.updateItem(item.id, name, point);
+                  }
 
-                  // Tutup dialog setelah simpan
                   Navigator.pop(context);
                 }
               },
-              child: Text("Simpan"),
+              child: Text(item == null ? "Simpan" : "Update"),
+            ),
+          ],
+        )
+    );
+  }
+
+  // ---- PENAMBAHAN FUNGSI BARU UNTUK MENAMPILKAN MODAL KONFIRMASI SEBELUM DELETE  ---- //
+  void _showDeleteConfirmation(String id, String name) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Hapus Item?"),
+          content: Text("Apakah Anda yakin ingin menghapus item '$name'? Data tidak akan bisa dikembalikan."),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Batal")
+            ),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () {
+                  _firestoreService.deleteItem(id);
+
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  "Hapus",
+                  style: TextStyle(
+                      color: Colors.white
+                  ),
+                )
             )
           ],
         )
     );
   }
 
-  // Lifecycle Method: Dipanggil saat halaman dihancurkan/ditutup
   @override
   void dispose() {
-    // Wajib: Hapus controller dari memori untuk mencegah Memory Leak
     _nameController.dispose();
     _pointController.dispose();
 
     super.dispose();
   }
 
-  // ====================================================================
-  // LOGIKA READ (Menampilkan Data)
-  // ====================================================================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Daftar Item'),
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.white,
-        ),
+      appBar: AppBar(
+        title: const Text("Daftar Item (READ)"),
+        backgroundColor: const Color(0xff009421),
+        foregroundColor: Colors.white,
+      ),
 
-        // Tombol Tambah (+) memanggil fungsi _showDialog
-        floatingActionButton: FloatingActionButton(
-          onPressed: _showDialog,
-          backgroundColor: Colors.green,
-          child: Icon(Icons.add, color: Colors.white,),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showDialog,
+        backgroundColor: const Color(0xff009421),
+        child: const Icon(Icons.add, color: Colors.white,),
+      ),
 
-        // StreamBuilder: Jantung dari fitur Real-time
-        // Widget ini akan "mendengarkan" perubahan data dari FirestoreService
-        body: StreamBuilder<List<Item>>(
-          stream: _firestoreService.getItems(), // Sumber datanya (Stream)
-          builder: (context, snapshot) {
-            // Kondisi 1: Sedang memuat data (Waiting)
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                  child: CircularProgressIndicator()
-              );
-            }
+      body: StreamBuilder<List<Item>>(
+        stream: _firestoreService.getItems(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-            // Kondisi 2: Terjadi Error saat mengambil data
-            if (snapshot.hasError) {
-              return Center(
-                  child: Text('Terjadi kesalahan: ${snapshot.error}')
-              );
-            }
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("Error: ${snapshot.error}"),
+            );
+          }
 
-            // Ambil data List<Item> dari snapshot
-            final List<Item> items = snapshot.data ?? [];
+          final List<Item> items = snapshot.data ?? [];
+          if (items.isEmpty) {
+            return const Center(
+              child: Text("Tidak ada item yang ditemukan."),
+            );
+          }
 
-            // Kondisi 3: Data berhasil diambil tapi kosong
-            if (items.isEmpty) {
-              return Center(
-                  child: Text('Tidak ada item yang dapat ditampilkan!')
-              );
-            }
+          return ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final Item item = items[index];
 
-            // Kondisi 4: Data ada, tampilkan menggunakan ListView
-            return  ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final Item item = items[index];
-
-                return Card(
-                  elevation: 2,
-                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: ListTile(
-                    title: Text(
-                        item.name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        )
-                    ),
-                    subtitle: Text(
-                        item.id
-                    ),
-                    trailing: Text(
-                      '${item.point} Poin',
-                      style: TextStyle(
-                          color: Colors.green[700],
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600
-                      ),
+              return Card(
+                elevation: 2,
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: ListTile(
+                  title: Text(
+                    item.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                );
-              },
-            );
-          },
-        )
+                  // ---- LETAK PERUBAHAN ---- //
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${item.point} Poin',
+                        style: TextStyle(
+                            color: Colors.green[700],
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600
+                        ),
+                      ),
+                      const SizedBox(width: 8,),
+                      // ---- TOMBOL IKON DELETE UNTUK DELETE ---- //
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red,),
+                        onPressed: () => _showDeleteConfirmation(item.id, item.name),
+                      )
+                    ],
+                  ),
+                  // ---- MENAMBAHKAN PARAMETER onTap AGAR SETIAP CARD DAPAT DIKLIK ---- //
+                  onTap: () => _showDialog(item: item),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

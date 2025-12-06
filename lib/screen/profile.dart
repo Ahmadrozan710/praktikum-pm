@@ -62,14 +62,14 @@ class ProfileScreen extends StatelessWidget{
                       child: Image.asset('assets/images/pp.png'),
                     ),
                     Text(
-                      'Timothy Manuel Chandra',
+                      'Ahmad Rozan Raufansyah Nasution',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600
                       ),
                     ),
                     Text(
-                      'timothymanuel@student.usu.ac.id',
+                      'ahmadrozan@student.usu.ac.id',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,

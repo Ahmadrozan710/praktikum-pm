@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -50,22 +41,53 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDgUJLeqjamh3rD2UyNSv7iU16barei-pE',
-    appId: '1:1086792323594:android:5eab26bde8ae44db4005f3',
-    messagingSenderId: '1086792323594',
-    projectId: 'my-first-app-2a4fd',
-    storageBucket: 'my-first-app-2a4fd.firebasestorage.app',
+    apiKey: 'AIzaSyC6yimRfY9Cq_EQTxo7547b1CD00XCZ5lE',
+    appId: '1:63554922604:android:167f6371aa0b93e85f1049',
+    messagingSenderId: '63554922604',
+    projectId: 'my-first-app-abc6f',
+    storageBucket: 'my-first-app-abc6f.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyButUXwtRunuiT7394DqRh1J8UpVK59qxg',
-    appId: '1:987265643272:ios:d4a60a54df5e6f99fcf2bd',
-    messagingSenderId: '987265643272',
-    projectId: 'my-first-flutter-app-18460',
-    storageBucket: 'my-first-flutter-app-18460.firebasestorage.app',
-    androidClientId: '987265643272-crbocsm161fkvsoo0us8v8dt1u0d3ggg.apps.googleusercontent.com',
-    iosClientId: '987265643272-r2plnpsk2s9ianm5b8mvkptt5fu6ko91.apps.googleusercontent.com',
+    apiKey: 'AIzaSyCoxEaFs9IGpgdzc5fKs1t36sn9Rt3WbQQ',
+    appId: '1:63554922604:ios:f5602d07d38e41f05f1049',
+    messagingSenderId: '63554922604',
+    projectId: 'my-first-app-abc6f',
+    storageBucket: 'my-first-app-abc6f.firebasestorage.app',
+    androidClientId: '63554922604-eovp34fk08ghreggvibnfq7e0dap11hj.apps.googleusercontent.com',
+    iosClientId: '63554922604-62e6gg1gm7r0vjqbmi45l73dcc51l014.apps.googleusercontent.com',
     iosBundleId: 'com.example.myFirstFlutterApp',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyA3R-wVyxeFHZ2LXEcL1ErGUnhbqZU8fPg',
+    appId: '1:63554922604:web:edc345eb9c69bfa75f1049',
+    messagingSenderId: '63554922604',
+    projectId: 'my-first-app-abc6f',
+    authDomain: 'my-first-app-abc6f.firebaseapp.com',
+    storageBucket: 'my-first-app-abc6f.firebasestorage.app',
+    measurementId: 'G-K9NN4BZGN6',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyCoxEaFs9IGpgdzc5fKs1t36sn9Rt3WbQQ',
+    appId: '1:63554922604:ios:f5602d07d38e41f05f1049',
+    messagingSenderId: '63554922604',
+    projectId: 'my-first-app-abc6f',
+    storageBucket: 'my-first-app-abc6f.firebasestorage.app',
+    androidClientId: '63554922604-eovp34fk08ghreggvibnfq7e0dap11hj.apps.googleusercontent.com',
+    iosClientId: '63554922604-62e6gg1gm7r0vjqbmi45l73dcc51l014.apps.googleusercontent.com',
+    iosBundleId: 'com.example.myFirstFlutterApp',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyA3R-wVyxeFHZ2LXEcL1ErGUnhbqZU8fPg',
+    appId: '1:63554922604:web:edc345eb9c69bfa75f1049',
+    messagingSenderId: '63554922604',
+    projectId: 'my-first-app-abc6f',
+    authDomain: 'my-first-app-abc6f.firebaseapp.com',
+    storageBucket: 'my-first-app-abc6f.firebasestorage.app',
+    measurementId: 'G-K9NN4BZGN6',
   );
 
 }
